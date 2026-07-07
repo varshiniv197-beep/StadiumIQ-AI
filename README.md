@@ -45,6 +45,16 @@ StadiumIQ AI combines operational telemetry with Generative AI (Gemini 1.5 Flash
 *   Better accessibility through inclusive navigation and voice assistance
 *   Improved sustainability monitoring using real-time operational metrics
 
+### 🎯 Project Goals
+*   Improve crowd safety and security during major match days
+*   Assist tournament operations with GenAI-driven decision support
+*   Reduce incident responder dispatch latencies
+*   Improve accessibility for visitors with mobility impairments
+*   Optimize transportation flow dispatches and transit hub loads
+*   Support multilingual communication for a global fanbase
+*   Improve sustainability monitoring (solar generation, water, waste)
+*   Demonstrate responsible, transparent, and explainable AI-assisted workflows
+
 ---
 
 ## 2. Repository Highlights
@@ -165,6 +175,52 @@ Sensors / Simulated Telemetry
 | **Authentication** | JWT (jsonwebtoken) & bcryptjs | Secure authentication token generation and password hashing. |
 | **Testing** | Vitest & Supertest | Automated test runner. |
 | **Styling** | Tailwind CSS & Vanilla CSS | Modular Tailwind utility configuration with custom Glassmorphism CSS overrides. |
+
+---
+
+## 🏗️ Engineering Principles
+
+StadiumIQ AI follows a modular, maintainable, and scalable architecture pattern:
+
+### Backend
+- **Layered Architecture**: Decoupled routes, controllers, services, and repositories.
+- **RESTful API Design**: Versioned endpoints under `/api/v1/` returning standardized payloads.
+- **Prisma Client ORM**: Unified, type-safe database queries.
+- **JWT-Based Authentication**: Secure stateless authentication and claims-based authorization.
+- **Centralized Error Handling**: Custom error types (`AppError`, `ValidationError`) caught globally.
+- **Zod Request Validation**: Automated middleware checking inputs at the network boundary.
+
+### Frontend
+- **Component-Based Layouts**: Reusable UI widgets and layout modules.
+- **Context API State**: Global state handlers (e.g. accessibility high contrast triggers).
+- **Custom React Hooks**: Encapsulated state update procedures.
+- **Responsive-First Design**: Optimized layouts supporting mobile, tablet, and widescreen consoles.
+
+---
+
+## 🤖 AI Decision Pipeline
+
+StadiumIQ AI implements an Explainable AI workflow for operational decision support:
+
+1. **Telemetry Ingestion**: Gathers live sensor metrics (crowd counts, transit delays, weather conditions).
+2. **Metric Normalization**: Standardizes sensor parameters.
+3. **Structured Prompt Injection**: Dynamically constructs systemic role instructions for Gemini.
+4. **Recommendation Generation**: Gemini 1.5 Flash analyzes threat factors and compiles action guidelines.
+5. **JSON Schema Validation**: Standardizes Gemini's output to structured JSON schemas.
+6. **Confidence Metrics & Explainability**: Calculates recommendation impact criteria and highlights rationale logic.
+7. **Operator Verification**: Presents clear suggestions to venue coordinators for active execution or ignore reviews.
+8. **Operational Seeding**: Logs outcomes inside operational learning databases.
+
+---
+
+## 📐 Code Quality Standards
+
+The codebase adheres strictly to enterprise code standards:
+*   **TypeScript Strict Mode**: Fully typed routes, services, and schema configurations.
+*   **SOLID Separation**: Business workflows decoupled from controllers and database transactions.
+*   **Centralized Error Handling**: Prevents leaks and returns uniform HTTP payload error models.
+*   **Shared Response Utilities**: Uniform API response wrapper maps all endpoints cleanly.
+*   **Environment-Based Configuration**: Clean separation of dev, test, and production database setups.
 
 ---
 
