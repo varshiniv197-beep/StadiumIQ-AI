@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -114,7 +114,7 @@ enum FeedbackRating {
 }
 
 model User {
-  id           String          @id @default(uuid())
+  id           String          @id @default(uuid()) @map("_id")
   email        String          @unique
   passwordHash String
   name         String
@@ -125,7 +125,7 @@ model User {
 }
 
 model CrowdTelemetry {
-  id                 String       @id @default(uuid())
+  id                 String       @id @default(uuid()) @map("_id")
   venue              StadiumVenue @default(METLIFE_STADIUM)
   zone               String       // E.g., "Gate A", "North Concourse"
   crowdCount         Int
@@ -138,7 +138,7 @@ model CrowdTelemetry {
 }
 
 model TransitStatus {
-  id                  String            @id @default(uuid())
+  id                  String            @id @default(uuid()) @map("_id")
   venue               StadiumVenue      @default(METLIFE_STADIUM)
   transportType       TransportType
   lineName            String            // E.g., "Line 1", "Shuttle Zone"
@@ -150,7 +150,7 @@ model TransitStatus {
 }
 
 model SustainabilityMetric {
-  id               String       @id @default(uuid())
+  id               String       @id @default(uuid()) @map("_id")
   venue            StadiumVenue @default(METLIFE_STADIUM)
   energyKWh        Float
   waterLiters      Float
@@ -163,7 +163,7 @@ model SustainabilityMetric {
 }
 
 model Incident {
-  id          String             @id @default(uuid())
+  id          String             @id @default(uuid()) @map("_id")
   venue       StadiumVenue       @default(METLIFE_STADIUM)
   category    IncidentCategory
   severity    Priority           @default(MEDIUM)
@@ -176,7 +176,7 @@ model Incident {
 }
 
 model IncidentTimeline {
-  id          String        @id @default(uuid())
+  id          String        @id @default(uuid()) @map("_id")
   incidentId  String
   incident    Incident      @relation(fields: [incidentId], references: [id])
   stage       TimelineStage
@@ -185,7 +185,7 @@ model IncidentTimeline {
 }
 
 model VolunteerTask {
-  id          String     @id @default(uuid())
+  id          String     @id @default(uuid()) @map("_id")
   title       String
   description String
   priority    Priority   @default(MEDIUM)
@@ -197,7 +197,7 @@ model VolunteerTask {
 }
 
 model CrowdAlert {
-  id              String       @id @default(uuid())
+  id              String       @id @default(uuid()) @map("_id")
   venue           StadiumVenue @default(METLIFE_STADIUM)
   type            AlertType    @default(BOTTLENECK)
   severity        Priority     @default(MEDIUM)
@@ -207,7 +207,7 @@ model CrowdAlert {
 }
 
 model OperationalRecommendation {
-  id                  String                 @id @default(uuid())
+  id                  String                 @id @default(uuid()) @map("_id")
   venue               StadiumVenue           @default(METLIFE_STADIUM)
   category            RecommendationCategory
   advice              String
@@ -219,7 +219,7 @@ model OperationalRecommendation {
 }
 
 model StaffReallocation {
-  id        String       @id @default(uuid())
+  id        String       @id @default(uuid()) @map("_id")
   venue     StadiumVenue @default(METLIFE_STADIUM)
   fromZone  String
   toZone    String
@@ -230,7 +230,7 @@ model StaffReallocation {
 }
 
 model LearningLog {
-  id             String       @id @default(uuid())
+  id             String       @id @default(uuid()) @map("_id")
   venue          StadiumVenue @default(METLIFE_STADIUM)
   eventName      String       // Scenario run (e.g. "Stampede simulation")
   recommendation String
@@ -241,7 +241,7 @@ model LearningLog {
 }
 
 model AuditLog {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @map("_id")
   userId    String?
   action    String
   details   String
@@ -249,7 +249,7 @@ model AuditLog {
 }
 
 model AIFeedback {
-  id               String         @id @default(uuid())
+  id               String         @id @default(uuid()) @map("_id")
   recommendationId String
   userRole         Role
   rating           FeedbackRating

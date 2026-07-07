@@ -69,7 +69,7 @@ StadiumIQ AI satisfies every core requirement of the FIFA World Cup 2026 operati
 ```mermaid
 graph TD
     Client[Next.js 15 Client App] <-->|JSON / HTTP v1| Express[Express TypeScript Backend]
-    Express <-->|Prisma Client| DB[(PostgreSQL Database)]
+    Express <-->|Prisma Client| DB[(MongoDB Atlas Cloud DB)]
     Express -->|Generative AI SDK| Gemini[Google Gemini API: gemini-1.5-flash]
 ```
 
@@ -80,13 +80,13 @@ sequenceDiagram
     participant Guard as Auth & Zod Middlewares
     participant Ctrl as Route Controller
     participant Svc as AI Service Wrapper
-    participant DB as PostgreSQL Database
+    participant DB as MongoDB Atlas Database
 
     Fan->>Guard: HTTP GET /api/v1/crowd/density?venue=METLIFE_STADIUM
     Guard->>Guard: Validate Authorization Token & Zod Schemas
     Guard->>Ctrl: Dispatch Request
     Ctrl->>DB: Query current Telemetry
-    DB-->>Ctrl: Telemetry Counts
+    DB-->>Ctrl: Telemetry Documents
     Ctrl->>Svc: Feed counts to AI Rationale Engine
     Svc-->>Ctrl: Returns forecast metrics & explainability parameters
     Ctrl-->>Fan: Return JSON Response 200 OK
@@ -181,7 +181,7 @@ sequenceDiagram
 ### 4.6 Deployment Architecture
 ```mermaid
 graph TD
-    Compose[Docker Compose Orchestrator] --> DBContainer[PostgreSQL Container - Port 5432]
+    Compose[Docker Compose Orchestrator] --> DBContainer[MongoDB Container - Port 27017]
     Compose --> BackendContainer[Express Node Backend - Port 5000]
     Compose --> FrontendContainer[Next.js Web Client - Port 3000]
     BackendContainer -->|Depends On| DBContainer
@@ -219,8 +219,8 @@ graph TD
 | **Frontend** | Next.js 16 (App Router) | React server/client components platform. |
 | **Backend** | Express (TypeScript) | Light-weight REST API gateway. |
 | **AI** | `@google/genai` (Gemini 1.5 Flash) | Natural language queries, simulations, briefings. |
-| **ORM** | Prisma ORM | Model definition, compiler checks, migration logs. |
-| **DB** | PostgreSQL (sqlite local dev) | Transaction data management. |
+| **ORM** | Prisma ORM | Model definition, compiler checks. |
+| **DB** | MongoDB (Atlas Cloud / local dev) | Transaction data management. |
 | **Charts** | Recharts | Render time-series crowd analytics. |
 | **A11y** | Lucide React + HTML5 Semantic | Clear visual cues and accessibility mapping. |
 | **Authentication** | JWT (jsonwebtoken) & bcryptjs | Secure authentication token generation and password hashing. |
@@ -236,7 +236,7 @@ StadiumIQ-AI/
 ├── .github/workflows/        # CI/CD pipelines (GitHub Actions)
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma     # Relational database models and strict enums
+│   │   ├── schema.prisma     # Prisma Schemas for MongoDB database
 │   │   └── seed.ts           # Seeding logic for dev database
 │   ├── src/
 │   │   ├── controllers/      # Route logic handlers (auth, crowd, volunteers, etc.)
@@ -279,73 +279,59 @@ StadiumIQ-AI/
 
 All back-end REST endpoints are versioned under `/api/v1/...`:
 
-| Endpoint | Method | Authentication | Purpose |
-| :--- | :--- | :--- | :--- |
-| `/api/v1/auth/signup` | POST | None | Registers new User accounts (FAN, ORGANIZER, etc.). |
-| `/api/v1/auth/login` | POST | None | Validates password credentials and returns JWT bearer tokens. |
-| `/api/v1/gemini/chat` | POST | None | Consults Gemini multilingual assistant on venue details. |
-| `/api/v1/gemini/simulation` | POST | Organizer / Security | Simulates operations emergencies and builds evacuation scripts. |
-| `/api/v1/gemini/resource-optimize` | POST | Organizer | Reallocates staff based on crowd sensor spikes. |
-| `/api/v1/gemini/briefing` | GET | None | Outputs summary briefs of transit, crowd, and current incidents. |
-| `/api/v1/gemini/announcement` | POST | Authenticated | Translates public text to translated audio scripts. |
-| `/api/v1/crowd/density` | GET | None | Fetches live headcount tracking across concourses. |
-| `/api/v1/transit/status` | GET | None | Lists metro, taxi, and parking lot occupancy status. |
-| `/api/v1/incidents` | GET | None | Displays reported active incident emergencies. |
-| `/api/v1/sustainability` | GET | None | Displays solar metric summaries. |
-| `/api/v1/health` | GET | None | System status and database latency monitoring. |
+| Endpoint | Method | Purpose |
+| :--- | :--- | :--- |
+| `/api/v1/auth/signup` | POST | Registers new User accounts (FAN, ORGANIZER, etc.). |
+| `/api/v1/auth/login` | POST | Validates password credentials and returns JWT bearer tokens. |
+| `/api/v1/gemini/chat` | POST | Consults Gemini multilingual assistant on venue details. |
+| `/api/v1/gemini/simulation` | POST | Simulates operations emergencies and builds evacuation scripts. |
+| `/api/v1/gemini/resource-optimize` | POST | Reallocates staff based on crowd sensor spikes. |
+| `/api/v1/gemini/briefing` | GET | Outputs summary briefs of transit, crowd, and current incidents. |
+| `/api/v1/gemini/announcement` | POST | Translates public text to translated audio scripts. |
+| `/api/v1/crowd/density` | GET | Fetches live headcount tracking across concourses. |
+| `/api/v1/transit/status` | GET | Lists metro, taxi, and parking lot occupancy status. |
+| `/api/v1/incidents` | GET | Displays reported active incident emergencies. |
+| `/api/v1/sustainability` | GET | Displays solar metric summaries. |
+| `/api/v1/health` | GET | System status and database latency monitoring. |
 
 ---
 
-## 10. Database Design
+## 10. Database Design (MongoDB Collection Schemas)
 
-```sql
--- Role Enum: Defines authorization permissions.
-CREATE TYPE "Role" AS ENUM ('FAN', 'ORGANIZER', 'VOLUNTEER', 'VENUE_STAFF', 'SECURITY_OFFICER', 'TRANSPORT_COORDINATOR', 'SUSTAINABILITY_MANAGER');
+```javascript
+// User Collection Document Schema
+{
+  "_id": ObjectId("..."),
+  "email": "organizer@fifa.com",
+  "passwordHash": "$2a$10$...",
+  "name": "Gianni Infantino",
+  "role": "ORGANIZER"
+}
 
--- User Entity: Stores accounts.
-CREATE TABLE "User" (
-  "id" TEXT PRIMARY KEY,
-  "email" TEXT UNIQUE NOT NULL,
-  "passwordHash" TEXT NOT NULL,
-  "name" TEXT NOT NULL,
-  "role" "Role" DEFAULT 'FAN'
-);
+// CrowdTelemetry Collection Document Schema
+{
+  "_id": ObjectId("..."),
+  "venue": "METLIFE_STADIUM",
+  "zone": "Gate A",
+  "crowdCount": 1500,
+  "capacityLimit": 3000,
+  "queueLength": 100,
+  "avgWaitTimeSeconds": 450,
+  "congestionLevel": 0.5,
+  "riskZone": false
+}
 
--- CrowdTelemetry: Monitors entry wait times.
-CREATE TABLE "CrowdTelemetry" (
-  "id" TEXT PRIMARY KEY,
-  "venue" "StadiumVenue" DEFAULT 'METLIFE_STADIUM',
-  "zone" TEXT NOT NULL,
-  "crowdCount" INTEGER NOT NULL,
-  "capacityLimit" INTEGER NOT NULL,
-  "queueLength" INTEGER NOT NULL,
-  "avgWaitTimeSeconds" INTEGER NOT NULL,
-  "congestionLevel" REAL NOT NULL,
-  "riskZone" BOOLEAN DEFAULT false
-);
-
--- TransitStatus: Tracks shuttle and metro delays.
-CREATE TABLE "TransitStatus" (
-  "id" TEXT PRIMARY KEY,
-  "venue" "StadiumVenue" DEFAULT 'METLIFE_STADIUM',
-  "transportType" "TransportType" NOT NULL,
-  "lineName" TEXT NOT NULL,
-  "status" "TransitStatusEnum" DEFAULT 'ON_TIME',
-  "delayMinutes" INTEGER DEFAULT 0,
-  "occupancyPercentage" INTEGER NOT NULL,
-  "parkingOccupancy" INTEGER
-);
-
--- Incident: Emergency incident records.
-CREATE TABLE "Incident" (
-  "id" TEXT PRIMARY KEY,
-  "venue" "StadiumVenue" DEFAULT 'METLIFE_STADIUM',
-  "category" "IncidentCategory" NOT NULL,
-  "severity" "Priority" DEFAULT 'MEDIUM',
-  "description" TEXT NOT NULL,
-  "status" "IncidentStatus" DEFAULT 'REPORTED',
-  "location" TEXT NOT NULL
-);
+// TransitStatus Collection Document Schema
+{
+  "_id": ObjectId("..."),
+  "venue": "METLIFE_STADIUM",
+  "transportType": "METRO",
+  "lineName": "Meadowlands Rail",
+  "status": "ON_TIME",
+  "delayMinutes": 0,
+  "occupancyPercentage": 65,
+  "parkingOccupancy": null
+}
 ```
 
 ---
@@ -357,7 +343,7 @@ CREATE TABLE "Incident" (
 *   **bcrypt password hashing**: Zero plaintext passwords saved.
 *   **Zod schema validation**: Strict typing schemas intercept requests, filtering out payload anomalies.
 *   **Rate limiters**: Intercepts spam routes to prevent API exhaustion.
-*   **Input Sanitization**: Rejects non-conforming parameters to block SQL injection.
+*   **Input Sanitization**: Rejects non-conforming parameters to block database injection.
 
 ---
 
@@ -372,9 +358,9 @@ CREATE TABLE "Incident" (
 
 ## 13. Performance
 
-*   **TypeScript Transpiling**: Backend build uses `tsc` to produce optimized CJS code.
+*   **TypeScript Transpiling**: Backend build uses `tsc` to produce optimized production code.
 *   **NextJS Static Generation**: Client components prerender static layouts at compile-time.
-*   **Prisma Query Optimization**: Relational fields utilize explicit indexes for sub-second latencies.
+*   **MongoDB Indexing**: Indexed fields (such as `_id` and unique `email` constraints) utilize explicit indices for sub-second database lookups.
 
 ---
 
@@ -398,18 +384,18 @@ Verify platform features by executing tests:
 2.  **Environment Variables**:
     Create a `.env` file in the `backend` folder with:
     ```env
-    DATABASE_URL="postgresql://admin:WorldCup2026Password!@localhost:5432/stadiumiq_dev?schema=public"
+    DATABASE_URL="mongodb://localhost:27017/stadiumiq_dev?retryWrites=true&w=majority"
     JWT_SECRET="FIFA2026_TournamentOperationsSecureTokenKey!"
     PORT=5000
     GEMINI_API_KEY="[YOUR_GOOGLE_GEMINI_API_KEY]"
     NODE_ENV=development
     ```
-3.  **Database Migration**:
-    Generate the database schema and seed the data:
+3.  **Database Index Alignment**:
+    Generate the database schema and synchronize indices with MongoDB:
     ```bash
     cd backend
     npx prisma generate
-    npx prisma migrate dev --name init
+    npx prisma db push
     npm run db:seed
     cd ..
     ```
@@ -430,7 +416,7 @@ Deploy the entire platform locally with a single command:
 docker compose up --build
 ```
 This builds and launches:
-1.  **PostgreSQL Container**: Databases on port 5432.
+1.  **MongoDB Container**: Database running on port 27017.
 2.  **Express Backend**: Express server on port 5000.
 3.  **Next.js Frontend**: NextJS web dashboard on port 3000.
 
@@ -440,7 +426,7 @@ This builds and launches:
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `DATABASE_URL` | Prisma DB connection URI. | `postgresql://...` |
+| `DATABASE_URL` | Prisma MongoDB connection URI. | `mongodb://...` |
 | `JWT_SECRET` | Secret token string used to sign user auth headers. | `FIFA2026_...` |
 | `GEMINI_API_KEY` | Google Gemini access key. | `""` |
 | `PORT` | Local network binding port. | `5000` |
