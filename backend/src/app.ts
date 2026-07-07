@@ -54,8 +54,8 @@ app.use('*', (_req, _res, next) => {
 // Centralized Error Handler
 app.use(errorHandler);
 
-// Start server (if not testing)
-if (process.env.NODE_ENV !== 'test') {
+// Start server (if not testing and not in serverless environment)
+if (process.env.NODE_ENV !== 'test' && !process.env.NETLIFY) {
   app.listen(PORT, () => {
     console.log(`==================================================`);
     console.log(`StadiumIQ AI Operations Server is booting...`);

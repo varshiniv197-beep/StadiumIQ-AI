@@ -1,0 +1,10 @@
+[build]
+  command = "npm run install:all && npm run build"
+  publish = "frontend/.next"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/v1/*"
+  to = "/.netlify/functions/api/api/v1/:splat"
+  status = 200
+  force = true
