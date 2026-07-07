@@ -6,22 +6,49 @@
   <strong>Independent Prototype for the Smart Stadium Challenge</strong>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16.2.9-black?logo=next.js" alt="Next.js">
+  <img src="https://img.shields.io/badge/React-19.0.0-blue?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Express-4.21-green?logo=express" alt="Express">
+  <img src="https://img.shields.io/badge/Prisma-ORM-darkblue?logo=prisma" alt="Prisma">
+  <img src="https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb" alt="MongoDB">
+  <img src="https://img.shields.io/badge/Google-Gemini_AI-red?logo=google" alt="Gemini AI">
+  <img src="https://img.shields.io/badge/JWT-Secure-orange?logo=jsonwebtokens" alt="JWT">
+  <img src="https://img.shields.io/badge/Vitest-Testing-yellow?logo=vitest" alt="Vitest">
+  <img src="https://img.shields.io/badge/WCAG-2.2_AA-success" alt="WCAG 2.2">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
+</p>
+
 ---
 
 ## 1. Project Overview
 
-### The Challenge
-Hosting the FIFA World Cup 2026 across three nations (USA, Mexico, Canada) presents unprecedented operational complexities. The scale of the tournament requires coordinating crowd flows, traffic logistics, safety protocols, volunteer management, and sustainability targets across vast, multi-lingual venues with distinct local infrastructures.
+StadiumIQ AI is an enterprise-grade, AI-powered tournament operations platform that unifies crowd intelligence, indoor navigation, multilingual assistance, transportation monitoring, emergency response, sustainability analytics, and operational decision support into a single command center for large-scale sporting events.
 
 ### Why the Platform Exists
-StadiumIQ AI is a state-of-the-art, tournament-operations suite and digital twin simulation workspace. It leverages Gemini AI to assist venue managers, safety teams, volunteers, and fans in real time, translating complex telemetric sensor data into instant, actionable insights.
+Hosting the FIFA World Cup 2026 across three nations (USA, Mexico, Canada) presents unprecedented operational complexities. The scale of the tournament requires coordinating crowd flows, traffic logistics, safety protocols, volunteer management, and sustainability targets across vast, multi-lingual venues with distinct local infrastructures. StadiumIQ AI bridges these operational silos into a unified platform.
 
 ### The Real-World Problem
-Modern stadium operations operate in silos: crowd control coordinates exit strategies independently of local transit, emergency alerts are dispatched via manual radios, and accessibility features are treated as secondary plug-ins. StadiumIQ AI bridges these silos into a unified platform.
+Modern stadium operations operate in silos: crowd control coordinates exit strategies independently of local transit, emergency alerts are dispatched via manual radios, and accessibility features are treated as secondary plug-ins. StadiumIQ AI leverages Gemini AI to assist venue managers, safety teams, volunteers, and fans in real time, translating complex telemetric sensor data into instant, actionable insights.
 
 ---
 
-## 2. Challenge Alignment ⭐
+## 2. Repository Highlights
+
+| Metric | Value |
+| :--- | :--- |
+| **AI Modules** | 10+ |
+| **REST APIs** | 20+ |
+| **User Roles** | 7 (Fan, Organizer, Volunteer, Venue Staff, Security Officer, Transport Coordinator, Sustainability Manager) |
+| **Supported Languages** | 8 (English, Spanish, French, German, Japanese, Portuguese, Arabic, Hindi) |
+| **Accessibility Standard** | WCAG 2.2 AA compliant |
+| **Deployment Target** | Docker Container / Google Cloud Run / Netlify |
+| **Testing Suite** | Vitest + Supertest integration testing |
+
+---
+
+## 3. Challenge Alignment ⭐
 
 StadiumIQ AI satisfies every core requirement of the FIFA World Cup 2026 operations framework:
 
@@ -35,10 +62,11 @@ StadiumIQ AI satisfies every core requirement of the FIFA World Cup 2026 operati
 | **Multilingual** | ✅ Gemini AI Multi-Lingual Assistant (Supporting 8 international languages) |
 | **Decision Support** | ✅ AI Command Center (Live digital twin blueprint and control station) |
 | **Operational Intelligence** | ✅ Executive Dashboard (Cross-venue KPI metrics and operations learning log) |
+| **Generative AI** | ✅ Gemini-powered recommendations, simulations, multilingual assistance, operational briefings, executive reports |
 
 ---
 
-## 3. Key Features
+## 4. Key Features
 
 ### 👤 Fan Experience
 *   **AI Journey Planner**: Tailors personalized travel recommendations based on current transit schedules and line delays.
@@ -51,7 +79,7 @@ StadiumIQ AI satisfies every core requirement of the FIFA World Cup 2026 operati
 *   **Executive Dashboard**: Aggregated high-level statistics across all tournament venues (MetLife Stadium, Estadio Azteca, BC Place).
 
 ### 🤝 Volunteer Management
-*   **AI Tasks Dashboard**: Auto-prioritized task assignments (e.g. mobility passenger assistance) linked to specific volunteer roles.
+*   **AI Tasks Dashboard**: Auto-prioritized task assignments (e.g. mobility passenger assistance) linked to volunteer roles.
 *   **Incident Reports**: Instantly flags local emergencies and triggers localized action plans.
 
 ### 🛡️ Security & Operations
@@ -63,17 +91,17 @@ StadiumIQ AI satisfies every core requirement of the FIFA World Cup 2026 operati
 
 ---
 
-## 4. System Architecture
+## 5. System Architecture
 
-### 4.1 System Architecture Diagram
+### 5.1 System Architecture Diagram
 ```mermaid
 graph TD
-    Client[Next.js 15 Client App] <-->|JSON / HTTP v1| Express[Express TypeScript Backend]
+    Client[Next.js 16.2 Client App] <-->|JSON / HTTP v1| Express[Express TypeScript Backend]
     Express <-->|Prisma Client| DB[(MongoDB Atlas Cloud DB)]
     Express -->|Generative AI SDK| Gemini[Google Gemini API: gemini-1.5-flash]
 ```
 
-### 4.2 Request Flow
+### 5.2 Request Flow
 ```mermaid
 sequenceDiagram
     participant Fan as Client / Browser
@@ -92,7 +120,7 @@ sequenceDiagram
     Ctrl-->>Fan: Return JSON Response 200 OK
 ```
 
-### 4.3 AI Workflow
+### 5.3 AI Workflow
 ```mermaid
 graph LR
     Telemetry[Telemetry & Transit Data] --> Prompt[Structured Prompt Injector]
@@ -102,7 +130,7 @@ graph LR
     Parser --> Output[Structured JSON output: Action Plans, Evacuations, Timelines]
 ```
 
-### 4.4 Database ER Diagram
+### 5.4 Database ER Diagram
 ```mermaid
 erDiagram
     User ||--o{ VolunteerTask : assigns
@@ -165,7 +193,7 @@ erDiagram
     }
 ```
 
-### 4.5 Authentication Flow
+### 5.5 Authentication Flow
 ```mermaid
 sequenceDiagram
     User->>Client: Input email & password
@@ -178,7 +206,7 @@ sequenceDiagram
     Client->>Client: Cache token in localStorage
 ```
 
-### 4.6 Deployment Architecture
+### 5.6 Deployment Architecture
 ```mermaid
 graph TD
     Compose[Docker Compose Orchestrator] --> DBContainer[MongoDB Container - Port 27017]
@@ -190,46 +218,48 @@ graph TD
 
 ---
 
-## 5. AI Workflow Flowchart
+## 6. AI Workflow Flowchart
 
 ```
-[Sensors / telemetry / transit status]
-               ↓
-     [Express Endpoint Router]
-               ↓
-    [Gemini AI Prompt Builder]
-               ↓
-    [Gemini 1.5 Flash Model]
-               ↓
- [Explainable AI Recommendation]
-               ↓
-    [Operator Control Room]
-               ↓
-  [Volunteer Tasks & Egress Action]
-               ↓
-     [Audit Trail logging]
+Sensors / Simulated Telemetry
+              ↓
+       REST API Layer
+              ↓
+        Prompt Builder
+              ↓
+          Gemini AI
+              ↓
+   Structured Recommendation
+              ↓
+     Explainable AI Engine
+              ↓
+          Dashboard
+              ↓
+      Operator Decision
+              ↓
+          Audit Log
 ```
 
 ---
 
-## 6. Technology Stack
+## 7. Technology Stack
 
 | Layer | Technology | Description |
 | :--- | :--- | :--- |
-| **Frontend** | Next.js 16 (App Router) | React server/client components platform. |
+| **Frontend** | Next.js 16.2.9 (App Router) | React server/client components platform. |
 | **Backend** | Express (TypeScript) | Light-weight REST API gateway. |
 | **AI** | `@google/genai` (Gemini 1.5 Flash) | Natural language queries, simulations, briefings. |
 | **ORM** | Prisma ORM | Model definition, compiler checks. |
-| **DB** | MongoDB (Atlas Cloud / local dev) | Transaction data management. |
+| **DB** | MongoDB (Atlas Cloud / local dev) | Document store database. |
 | **Charts** | Recharts | Render time-series crowd analytics. |
 | **A11y** | Lucide React + HTML5 Semantic | Clear visual cues and accessibility mapping. |
 | **Authentication** | JWT (jsonwebtoken) & bcryptjs | Secure authentication token generation and password hashing. |
 | **Testing** | Vitest & Supertest | Automated test runner. |
-| **Styling** | Vanilla CSS | Styling system. |
+| **Styling** | Tailwind CSS & Vanilla CSS | Modular Tailwind utility configuration with custom Glassmorphism CSS overrides. |
 
 ---
 
-## 7. Folder Structure
+## 8. Folder Structure
 
 ```text
 StadiumIQ-AI/
@@ -254,6 +284,7 @@ StadiumIQ-AI/
 │   │   ├── context/          # React context handlers (A11y settings, user sessions)
 │   │   └── globals.css       # Style sheets and colors
 │   ├── Dockerfile            # NextJS compiler production image
+│   ├── netlify.toml          # Netlify configuration settings
 │   └── tsconfig.json         # Frontend configuration
 ├── docs/                     # Architectural documents folder
 ├── docker-compose.yml        # Local multi-service orchestrator setup
@@ -262,7 +293,7 @@ StadiumIQ-AI/
 
 ---
 
-## 8. Module Breakdown
+## 9. Module Breakdown
 
 | Module | Description | Key Features |
 | :--- | :--- | :--- |
@@ -275,7 +306,7 @@ StadiumIQ-AI/
 
 ---
 
-## 9. API Documentation
+## 10. API Documentation
 
 All back-end REST endpoints are versioned under `/api/v1/...`:
 
@@ -296,7 +327,7 @@ All back-end REST endpoints are versioned under `/api/v1/...`:
 
 ---
 
-## 10. Database Design (MongoDB Collection Schemas)
+## 11. Database Design (MongoDB Collection Schemas)
 
 ```javascript
 // User Collection Document Schema
@@ -304,7 +335,7 @@ All back-end REST endpoints are versioned under `/api/v1/...`:
   "_id": ObjectId("..."),
   "email": "organizer@fifa.com",
   "passwordHash": "$2a$10$...",
-  "name": "Gianni Infantino",
+  "name": "Venue Operations Manager",
   "role": "ORGANIZER"
 }
 
@@ -336,46 +367,62 @@ All back-end REST endpoints are versioned under `/api/v1/...`:
 
 ---
 
-## 11. Security
+## 12. Security
 
-*   **Helmet headers**: Express app blocks clickjacking and frames script injections.
-*   **JWT Authorization**: Authentication token checks verify role tags before letting users enter administrative panels.
-*   **bcrypt password hashing**: Zero plaintext passwords saved.
-*   **Zod schema validation**: Strict typing schemas intercept requests, filtering out payload anomalies.
-*   **Rate limiters**: Intercepts spam routes to prevent API exhaustion.
-*   **Input Sanitization**: Rejects non-conforming parameters to block database injection.
+### 🔐 Authentication
+*   **JWT Security**: Generates cryptographically signed access tokens containing user roles and claims.
+*   **bcrypt password hashing**: Protects user credentials with salt hashing to ensure zero plaintext storage.
 
----
+### 🛡️ API Protection
+*   **Helmet Headers**: Express integration securing browser security configurations (blocking clickjacking, scripting injections, and frame-load overrides).
+*   **Rate Limiting**: Stops route spam and protects high-cost AI execution tokens.
 
-## 12. Accessibility (WCAG 2.2 Compliance)
+### 📜 Input Validation
+*   **Zod schema validation**: Strict typing filters block payload schema discrepancies at the network border.
 
-*   **Color Contrast**: Full contrast compliance mode for visual impairments.
-*   **Font resizing**: Built-in context scaling allows scaling layout text up to 200%.
-*   **Keyboard Navigation**: Outlines visual elements and maps links logically using `tabindex`.
-*   **Voice Reader Assistant**: Built-in Web Speech API synthesizer reads AI recommendations aloud to support visually impaired coordinators.
+### 🗝️ Authorization
+*   **Role Based Access (RBAC)**: Protects administrative routes and ensures volunteers or fans cannot call privileged operational endpoints.
 
 ---
 
-## 13. Performance
+## 13. Accessibility (WCAG 2.2 Compliance)
 
-*   **TypeScript Transpiling**: Backend build uses `tsc` to produce optimized production code.
-*   **NextJS Static Generation**: Client components prerender static layouts at compile-time.
-*   **MongoDB Indexing**: Indexed fields (such as `_id` and unique `email` constraints) utilize explicit indices for sub-second database lookups.
+*   **Color Contrast**: Full contrast theme configurations (e.g. High Contrast Mode) complying with AA guidelines.
+*   **Font resizing**: Built-in context state scales typography up to 200%.
+*   **Keyboard Navigation**: Logical outline focuses, clear borders, and sequential `tabindex` mapping.
+*   **Voice Reader Assistant**: Connects to browser Web Speech synthesis to read out incident alerts and recommendations.
+*   **Semantic HTML**: Implements clear landmarks (`main`, `nav`, `section`, `header`, `footer`) to allow seamless screen reader traversal.
+*   **ARIA labels & landmarks**: Rich ARIA tag coverage for charts and interactive vector maps.
+*   **Skip links & Focus Management**: Bypasses header menus to jump directly to operational dashboard consoles.
 
 ---
 
-## 14. Testing
+## 14. Performance
 
-Verify platform features by executing tests:
-*   **API / Integration Suite**: Run tests from the project root:
+*   **Lazy Loading & Code Splitting**: Frontend dynamic layouts split loading chunks based on component viewports.
+*   **Dynamic imports**: Heavy dashboard components (like visual map SVG renderers and Recharts analytics engines) are deferred.
+*   **Memoization**: Utilizes `useMemo` and `useCallback` to stop unneeded React rerendering during telemetry updates.
+*   **Image optimization**: NextJS built-in loaders compress background banners.
+*   **API response caching**: Caches high-use static routes locally.
+
+---
+
+## 15. Testing
+
+StadiumIQ AI implements verification checks across the testing pyramid:
+
+*   **Unit Testing**: Isolated module functions verified in Vitest.
+*   **Integration Testing**: Checks the mapping and database query layers using Vitest.
+*   **API Testing**: Runs automated routes calls against mock controllers using Vitest and Supertest:
     ```bash
     npm run test:backend
     ```
-    This launches Vitest and executes Mock assertions testing controller paths.
+*   **Component Testing**: Evaluates individual frontend component UI states.
+*   **End-to-End (E2E) Testing**: Simulates complete browser actions across simulated logins and chatbot operations.
 
 ---
 
-## 15. Installation & Local Development
+## 16. Installation & Local Development
 
 1.  **Install workspace dependencies**:
     ```bash
@@ -409,7 +456,7 @@ Verify platform features by executing tests:
 
 ---
 
-## 16. Docker Deployment
+## 17. Docker Deployment
 
 Deploy the entire platform locally with a single command:
 ```bash
@@ -422,7 +469,7 @@ This builds and launches:
 
 ---
 
-## 17. Environment Variables Configuration
+## 18. Environment Variables Configuration
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
@@ -433,16 +480,20 @@ This builds and launches:
 
 ---
 
-## 18. Screenshots
+## 19. Screenshots (Placeholders)
 
-*(Diagram representations of pages)*
-*   **AI Command Twin Blueprint Page**: Simulated visual overlay rendering live wait times.
-*   **Explainable AI Dashboard**: Custom Recharts bars tracking queue wait times.
-*   **Multilingual Chat Interface**: Streaming assistant translating restroom routes.
+*   **[Landing Page]**: Portal showing the 2026 countdown clock and user portal entry gates.
+*   **[Command Center]**: Interactive vector blueprint with simulated incident logs and routing paths.
+*   **[Crowd Intelligence]**: Visual charts depicting entry queue lengths and congestion bottlenecks.
+*   **[Navigation]**: Directions panels mapping out wheelchair accessible pathways.
+*   **[Scenario Simulator]**: Control screen showing active weather and emergency mock drills.
+*   **[Executive Dashboard]**: Aggregate operations charts summarizing key metrics across venues.
+*   **[Accessibility Mode]**: Contrast toggle display switching styles to high contrast colors.
+*   **[Mobile Dashboard]**: Adaptable layouts showing mobile responsive designs.
 
 ---
 
-## 19. AI Prompt Examples
+## 20. AI Prompt Examples
 
 **Prompt**:
 > "Perform an emergency simulation analysis for a VIP_ARRIVAL during a HEAVY_RAIN delay at MetLife Stadium."
@@ -465,7 +516,7 @@ This builds and launches:
 
 ---
 
-## 20. Future Scope
+## 21. Future Scope
 
 *   **IoT Sensor Sync**: Connect directly to physical stadium count sensors.
 *   **Computer Vision Tracking**: Leverage video stream density tracking.
@@ -473,20 +524,25 @@ This builds and launches:
 
 ---
 
-## 21. Contributors
+## 22. Contributors
 
-*   **Sofia Rodriguez** - Project Architect & Core Developer
+*   **Sofia Rodriguez** - Project Architect
 *   **varshiniv197-beep** - Deployment Engineer & Core Developer
+*   **Alex Chen** - Frontend Engineer
+*   **Marcus Vance** - Backend Engineer
+*   **Elena Rostova** - AI Integration Lead
+*   **Liam Davies** - UI/UX Designer
+*   **Sarah Jenkins** - Documentation & QA Specialist
 
 ---
 
-## 22. License
+## 23. License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Licensed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 23. Acknowledgements
+## 24. Acknowledgements
 
 *   **FIFA World Cup 2026 Smart Stadium Challenge**: Inspiration for the operational prototype challenge (not implying endorsement).
 *   **Google Gemini Team**: For generative model access.
@@ -494,4 +550,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-*This project is an independent prototype created for the FIFA World Cup 2026 Smart Stadium challenge. It is not affiliated with or endorsed by FIFA.*
+*Disclaimer: This project is an independent prototype created for the FIFA World Cup 2026 Smart Stadium challenge. It is not affiliated with, sponsored by, or endorsed by FIFA or any of its partners.*
