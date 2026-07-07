@@ -15,7 +15,8 @@
     "test": "npm run test:backend && npm run test:frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prisma": "^6.19.3"
   },
   "dependencies": {
     "@google/genai": "^2.10.0",
