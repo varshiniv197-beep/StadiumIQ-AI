@@ -195,13 +195,13 @@ export default function LandingPage() {
               StadiumIQ AI transforms fragmented stadium operations into a unified AI-powered command center. Using Generative AI and live operational telemetry, the platform predicts congestion, recommends actions, assists multilingual visitors, optimizes resources, and supports informed decision-making across tournament venues.
             </p>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center">
-                <div className="text-2xl font-black text-emerald-400">30% Less</div>
-                <div className="text-xs text-slate-400 font-medium">Queue Wait Times</div>
+              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center flex flex-col justify-center">
+                <div className="text-md font-black text-emerald-400">Congestion Relief</div>
+                <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug">Predictive crowd intelligence routes fans dynamically to avoid gate logjams.</div>
               </div>
-              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center">
-                <div className="text-2xl font-black text-emerald-400">20% Faster</div>
-                <div className="text-xs text-slate-400 font-medium">Emergency Response</div>
+              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center flex flex-col justify-center">
+                <div className="text-md font-black text-emerald-400">Rapid Response</div>
+                <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug">AI incident workflow generation updates dispatched responders in real-time.</div>
               </div>
             </div>
           </div>

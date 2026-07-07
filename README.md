@@ -38,11 +38,12 @@ Large-scale tournaments demand real-time coordination between crowd movement, tr
 ### 💡 Our Solution
 StadiumIQ AI combines operational telemetry with Generative AI (Gemini 1.5 Flash) to provide a unified command platform that predicts issues, recommends actions, assists multilingual visitors, and streamlines operations across tournament venues.
 
-### 📈 Expected Impact
-*   **30%** Less Concourse Queue Wait Time
-*   **20%** Faster Emergency Dispatch Response
-*   Complete WCAG 2.2 AA Accessibility Mappings
-*   Lower Stadium Carbon Footprint via Automated Telemetry Monitoring
+### 📈 Expected Operational Outcomes
+*   Reduced crowd congestion through predictive crowd intelligence
+*   Faster incident awareness using AI-assisted operational alerts
+*   Improved multilingual communication for international visitors
+*   Better accessibility through inclusive navigation and voice assistance
+*   Improved sustainability monitoring using real-time operational metrics
 
 ---
 
