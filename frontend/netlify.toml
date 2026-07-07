@@ -1,6 +1,6 @@
 [build]
-  command = "npm run install:all && npm run build"
-  publish = "frontend/.next"
+  command = "npm run build"
+  publish = ".next"
   functions = "netlify/functions"
 
 [[redirects]]
