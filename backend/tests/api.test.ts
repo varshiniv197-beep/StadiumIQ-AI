@@ -1,10 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import request from 'supertest';
-import app from '../src/app';
-import { prisma } from '../src/utils/prisma';
-import { geminiService } from '../src/services/gemini.service';
+import { vi } from 'vitest';
 
-// Mock authentication middleware to bypass auth logic in tests
+// Mocks must be hoisted before imports of modules that load the config/db module
 vi.mock('../src/middlewares/auth', () => {
   return {
     authenticate: (req: any, _res: any, next: any) => {
@@ -17,7 +13,7 @@ vi.mock('../src/middlewares/auth', () => {
   };
 });
 
-vi.mock('../src/utils/prisma', () => {
+vi.mock('../src/config/db', () => {
   return {
     prisma: {
       user: {
@@ -90,6 +86,12 @@ vi.mock('../src/services/gemini.service', () => {
   };
 });
 
+import { describe, it, expect, beforeEach } from 'vitest';
+import request from 'supertest';
+import app from '../src/app';
+import { prisma } from '../src/config/db';
+import { geminiService } from '../src/services/gemini.service';
+
 describe('StadiumIQ AI Backend API Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -116,8 +118,8 @@ describe('StadiumIQ AI Backend API Tests', () => {
       const res = await request(app).get('/api/v1/crowd/density?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.telemetry).toBeInstanceOf(Array);
-      expect(res.body.telemetry[0]).toHaveProperty('zone', 'Gate A');
+      expect(res.body.data.telemetry).toBeInstanceOf(Array);
+      expect(res.body.data.telemetry[0]).toHaveProperty('zone', 'Gate A');
     });
 
     it('should fetch crowd counts and density metrics (alias endpoint)', async () => {
@@ -129,8 +131,8 @@ describe('StadiumIQ AI Backend API Tests', () => {
       const res = await request(app).get('/api/v1/crowd/telemetry?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.telemetry).toBeInstanceOf(Array);
-      expect(res.body.telemetry[0]).toHaveProperty('zone', 'Gate A');
+      expect(res.body.data.telemetry).toBeInstanceOf(Array);
+      expect(res.body.data.telemetry[0]).toHaveProperty('zone', 'Gate A');
     });
   });
 
@@ -145,7 +147,7 @@ describe('StadiumIQ AI Backend API Tests', () => {
       const res = await request(app).get('/api/v1/transit/status?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.transit[0]).toHaveProperty('lineName', 'Expo Line Line');
+      expect(res.body.data.transit[0]).toHaveProperty('lineName', 'Expo Line Line');
     });
   });
 
@@ -160,7 +162,7 @@ describe('StadiumIQ AI Backend API Tests', () => {
       const res = await request(app).get('/api/v1/transit/recommendations?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.recommendation).toContain('Red Line');
+      expect(res.body.data.recommendation).toContain('Red Line');
     });
   });
 
@@ -177,7 +179,7 @@ describe('StadiumIQ AI Backend API Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.response).toBe('Mock response from Gemini');
+      expect(res.body.data.response).toBe('Mock response from Gemini');
       expect(geminiService.generateChatResponse).toHaveBeenCalledWith(
         'How do I get to Gate A?',
         [],
@@ -202,8 +204,8 @@ describe('StadiumIQ AI Backend API Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body).toHaveProperty('simulation');
-      expect(res.body.simulation.riskAssessment).toBe('High Risk Alert');
+      expect(res.body.data).toHaveProperty('simulation');
+      expect(res.body.data.simulation.riskAssessment).toBe('High Risk Alert');
       expect(geminiService.simulateScenario).toHaveBeenCalled();
     });
   });
@@ -222,8 +224,8 @@ describe('StadiumIQ AI Backend API Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.summary).toBe('Mock optimization summary');
-      expect(res.body.reallocations).toBeInstanceOf(Array);
+      expect(res.body.data.summary).toBe('Mock optimization summary');
+      expect(res.body.data.reallocations).toBeInstanceOf(Array);
     });
   });
 
@@ -237,7 +239,7 @@ describe('StadiumIQ AI Backend API Tests', () => {
       const res = await request(app).get('/api/v1/gemini/briefing?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.brief).toBe('Mock operational briefing text');
+      expect(res.body.data.brief).toBe('Mock operational briefing text');
     });
   });
 
@@ -254,14 +256,14 @@ describe('StadiumIQ AI Backend API Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.script).toBe('Mock script');
+      expect(res.body.data.script).toBe('Mock script');
     });
   });
 
   // 10. Sustainability Metric
   describe('GET /api/v1/sustainability', () => {
     it('should fetch sustainability metrics', async () => {
-      vi.mocked(prisma.sustainabilityMetric.findFirst).mockResolvedValue({
+      vi.mocked(prisma.sustainabilityMetric.findMany).mockResolvedValue([{
         id: '1',
         energyKWh: 5000,
         waterLiters: 10000,
@@ -271,12 +273,12 @@ describe('StadiumIQ AI Backend API Tests', () => {
         solarGeneration: 1500,
         foodWasteKg: 200,
         timestamp: new Date()
-      } as any);
+      }] as any);
 
       const res = await request(app).get('/api/v1/sustainability?venue=METLIFE_STADIUM');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.metrics).toHaveProperty('energyKWh', 5000);
+      expect(res.body.data.metrics).toHaveProperty('energyKWh', 5000);
     });
   });
 });

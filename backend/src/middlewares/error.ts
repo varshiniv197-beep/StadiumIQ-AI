@@ -11,19 +11,44 @@ export class AppError extends Error {
   }
 }
 
+export class AuthenticationError extends AppError {
+  constructor(message = 'Authentication failed.') {
+    super(401, message);
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message = 'Validation failed.', errors?: any) {
+    super(400, message, errors);
+  }
+}
+
+export class DatabaseError extends AppError {
+  constructor(message = 'Database query failed.') {
+    super(500, message);
+  }
+}
+
+export class AIServiceError extends AppError {
+  constructor(message = 'AI Generation model failed.') {
+    super(502, message);
+  }
+}
+
 export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  console.error('[ErrorHandler] Caught exception:', err);
+  const timestamp = new Date().toISOString();
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
       message: err.message,
-      errors: err.errors
+      data: err.errors || null,
+      timestamp
     });
   }
 
@@ -32,13 +57,15 @@ export const errorHandler = (
     return res.status(400).json({
       success: false,
       message: 'Database operational constraint violated.',
-      error: process.env.NODE_ENV === 'production' ? {} : err.message
+      data: process.env.NODE_ENV === 'production' ? null : { details: err.message },
+      timestamp
     });
   }
 
   return res.status(500).json({
     success: false,
     message: 'Internal server error.',
-    error: process.env.NODE_ENV === 'production' ? {} : err.message
+    data: process.env.NODE_ENV === 'production' ? null : { details: err.message },
+    timestamp
   });
 };

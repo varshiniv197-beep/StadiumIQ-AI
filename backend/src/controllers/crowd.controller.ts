@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../utils/prisma';
-import { geminiService } from '../services/gemini.service';
-import { z } from 'zod';
 import { StadiumVenue } from '@prisma/client';
+import { CrowdService } from '../services/crowd.service';
+import { sendResponse } from '../utils/response';
+import { z } from 'zod';
 
 export const explainSchema = z.object({
   body: z.object({
@@ -21,10 +21,8 @@ export class CrowdController {
   static async getTelemetry(req: Request, res: Response, next: NextFunction) {
     const venue = ((req.query.venue as string) || 'METLIFE_STADIUM') as StadiumVenue;
     try {
-      const data = await prisma.crowdTelemetry.findMany({
-        where: { venue }
-      });
-      return res.status(200).json({ success: true, telemetry: data });
+      const data = await CrowdService.getTelemetry(venue);
+      return sendResponse(res, 200, true, 'Crowd telemetry retrieved successfully.', { telemetry: data });
     } catch (error) {
       return next(error);
     }
@@ -34,11 +32,8 @@ export class CrowdController {
   static async getAlerts(req: Request, res: Response, next: NextFunction) {
     const venue = ((req.query.venue as string) || 'METLIFE_STADIUM') as StadiumVenue;
     try {
-      const data = await prisma.crowdAlert.findMany({
-        where: { venue },
-        orderBy: { timestamp: 'desc' }
-      });
-      return res.status(200).json({ success: true, alerts: data });
+      const data = await CrowdService.getAlerts(venue);
+      return sendResponse(res, 200, true, 'Crowd alerts retrieved successfully.', { alerts: data });
     } catch (error) {
       return next(error);
     }
@@ -48,32 +43,8 @@ export class CrowdController {
   static async getForecast(req: Request, res: Response, next: NextFunction) {
     const venue = ((req.query.venue as string) || 'METLIFE_STADIUM') as StadiumVenue;
     try {
-      const telemetry = await prisma.crowdTelemetry.findMany({
-        where: { venue }
-      });
-
-      // Calculate future congestion based on current states
-      const forecast = telemetry.map(t => {
-        const currentCongestion = t.congestionLevel;
-        // Mock progressive forecasts
-        const tenMin = Math.min(1, Math.max(0, currentCongestion + (Math.random() * 0.1 - 0.03)));
-        const twentyMin = Math.min(1, Math.max(0, tenMin + (Math.random() * 0.12 - 0.04)));
-        const thirtyMin = Math.min(1, Math.max(0, twentyMin + (Math.random() * 0.15 - 0.05)));
-        const sixtyMin = Math.min(1, Math.max(0, thirtyMin + (Math.random() * 0.2 - 0.07)));
-
-        return {
-          zone: t.zone,
-          capacityLimit: t.capacityLimit,
-          current: Math.round(t.crowdCount),
-          t10: Math.round(t.capacityLimit * tenMin),
-          t20: Math.round(t.capacityLimit * twentyMin),
-          t30: Math.round(t.capacityLimit * thirtyMin),
-          t60: Math.round(t.capacityLimit * sixtyMin),
-          congestionTrend: sixtyMin > currentCongestion ? 'INCREASING' : 'STABLE'
-        };
-      });
-
-      return res.status(200).json({ success: true, forecast });
+      const forecast = await CrowdService.getForecast(venue);
+      return sendResponse(res, 200, true, 'Crowd forecasts generated successfully.', { forecast });
     } catch (error) {
       return next(error);
     }
@@ -84,9 +55,8 @@ export class CrowdController {
     const { advice } = req.body;
     const venue = ((req.query.venue as string) || 'METLIFE_STADIUM') as StadiumVenue;
     try {
-      const telemetry = await prisma.crowdTelemetry.findMany({ where: { venue } });
-      const explanation = await geminiService.explainRecommendation(advice, telemetry);
-      return res.status(200).json({ success: true, explanation });
+      const explanation = await CrowdService.explainRecommendation(advice, venue);
+      return sendResponse(res, 200, true, 'Recommendation explanation generated successfully.', { explanation });
     } catch (error) {
       return next(error);
     }
@@ -97,11 +67,8 @@ export class CrowdController {
     const { query } = req.body;
     const venue = ((req.query.venue as string) || 'METLIFE_STADIUM') as StadiumVenue;
     try {
-      const telemetry = await prisma.crowdTelemetry.findMany({ where: { venue } });
-      const transit = await prisma.transitStatus.findMany({ where: { venue } });
-
-      const answer = await geminiService.answerOperationsQuery(query, telemetry, transit);
-      return res.status(200).json({ success: true, answer });
+      const answer = await CrowdService.queryKnowledgeBase(query, venue);
+      return sendResponse(res, 200, true, 'Knowledge base query executed successfully.', { answer });
     } catch (error) {
       return next(error);
     }

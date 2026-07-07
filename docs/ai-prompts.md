@@ -1,85 +1,41 @@
-# StadiumIQ AI - Prompt Engineering Specs
+# AI Prompting Schemas
 
-This document highlights the prompt engineering templates, context injection maps, and output formatting guidelines utilized in our Google Gemini integration layer (`backend/src/services/gemini.service.ts`).
+We leverage Google Gemini AI to coordinate crowd analysis, simulate drills, and draft localized announcements. All prompts return strict structured JSON payloads to prevent structural parsing errors.
 
----
+## 1. Operations Briefing Prompt
 
-## 1. Multilingual Operations Assistant Prompt
-
-### System Instruction Template
+```text
+Create an executive operations briefing for [Venue].
+Telemetry: [Telemetry Data]
+Transit: [Transit Data]
+Incidents: [Incidents Data]
+Respond in JSON format:
+{
+  "risks": ["Risk 1", "Risk 2"],
+  "weatherForecast": "forecast text",
+  "expectedAttendance": 75000,
+  "peakEntryTime": "18:30 - 19:15",
+  "volunteerShortages": "status description",
+  "transitDelays": "status description",
+  "securityAlerts": "status description",
+  "recommendedActions": ["Action 1", "Action 2"],
+  "summary": "executive summary text"
+}
 ```
-You are StadiumIQ AI, the official FIFA World Cup 2026 Smart Stadium Operations Assistant.
-Your goal is to assist fans, volunteers, venue staff, and emergency coordinators.
-Answer queries concisely and professionally.
-You must respond in {language}.
-Provide accurate advice about restrooms, food courts, transport zones, medical help, lost and found, ticket validation, and emergency protocols.
-```
 
-### Context Injection
-* **Live Parameters**: If available, the service appends current telemetry and transport parameters.
-* **History**: The chat controller passes an array of up to 10 history nodes to preserve conversational context.
+## 2. Emergency Simulation Prompt
 
----
-
-## 2. Crisis Scenario Simulation Prompt
-
-### prompt Template
-```
-Simulate a critical tournament incident: "{scenario}" at {venue}.
-Current crowd telemetry status: {telemetry}.
-Generate an emergency operations plan in JSON format matching the schema below:
+```text
+Simulate a critical tournament incident: "[Incident Type]" at [Venue].
+Current crowd telemetry status: [Telemetry Data].
+Generate an emergency operations plan in JSON:
 {
   "riskAssessment": "detailed string of risks",
   "actionPlan": ["step 1", "step 2", "step 3"],
   "resourceAllocation": "resource redirection strategy details",
   "evacuationStrategy": "evacuation routes details",
   "announcements": [
-    { "language": "English", "text": "public address script" },
-    { "language": "Spanish", "text": "public address script" }
+    { "language": "English", "text": "public address script" }
   ]
 }
 ```
-
-### Safety Filters
-* The backend runs the standard model in strict JSON mode (`responseMimeType: 'application/json'`) to ensure compatibility with client parsing routines.
-
----
-
-## 3. Explainable AI Rationale Prompt
-
-### Prompt Template
-```
-Explain the operational recommendation: "{advice}".
-Telemetry: {telemetry}
-Detail the confidence score and contributing metrics.
-Return JSON:
-{
-  "reasoning": "rationale string",
-  "confidence": 92,
-  "expectedImprovement": "Reduce queue wait by 15%",
-  "contributingMetrics": [
-    { "metric": "Gate D crowding", "weightPercentage": 40, "state": "Critical congestion" }
-  ]
-}
-```
-* **Objective**: Establish transparency behind automated dispatcher recommendations.
-
----
-
-## 4. Personal Itinerary Planner Prompt
-
-### Prompt Template
-```
-Create a step-by-step match-day timeline for a fan in seat {seat} traveling by {transport}.
-Preferences: food={food}, accessibility={accessibility}.
-Write itinerary descriptions in {language}.
-Return JSON:
-{
-  "itinerary": [
-    { "stage": "Stage Name", "time": "15:00", "description": "text", "tip": "tip text" }
-  ],
-  "accessibilityInfo": "accessibility routes advice",
-  "suggestedGate": "Gate C"
-}
-```
-* **Objective**: Generate custom Fan travel plans matching language and physical requirements.

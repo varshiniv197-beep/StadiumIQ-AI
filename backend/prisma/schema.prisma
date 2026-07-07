@@ -135,6 +135,8 @@ model CrowdTelemetry {
   congestionLevel    Float        // 0.0 to 1.0
   riskZone           Boolean      @default(false)
   timestamp          DateTime     @default(now())
+
+  @@index([venue])
 }
 
 model TransitStatus {
@@ -147,6 +149,8 @@ model TransitStatus {
   occupancyPercentage Int
   parkingOccupancy    Int?
   timestamp           DateTime          @default(now())
+
+  @@index([venue])
 }
 
 model SustainabilityMetric {
@@ -160,6 +164,8 @@ model SustainabilityMetric {
   solarGeneration  Float        @default(0.0)
   foodWasteKg      Float        @default(0.0)
   timestamp        DateTime     @default(now())
+
+  @@index([venue])
 }
 
 model Incident {
@@ -173,6 +179,8 @@ model Incident {
   reportedAt  DateTime           @default(now())
   resolvedAt  DateTime?
   timeline    IncidentTimeline[]
+
+  @@index([venue])
 }
 
 model IncidentTimeline {
@@ -204,6 +212,8 @@ model CrowdAlert {
   message         String
   suggestedAction String
   timestamp       DateTime     @default(now())
+
+  @@index([venue])
 }
 
 model OperationalRecommendation {
@@ -216,6 +226,8 @@ model OperationalRecommendation {
   expectedImprovement String                 @default("")
   status              RecommendationStatus   @default(OPEN)
   createdAt           DateTime               @default(now())
+
+  @@index([venue])
 }
 
 model StaffReallocation {
@@ -227,6 +239,8 @@ model StaffReallocation {
   quantity  Int
   reason    String
   timestamp DateTime     @default(now())
+
+  @@index([venue])
 }
 
 model LearningLog {
@@ -238,6 +252,8 @@ model LearningLog {
   outcome        String
   lessonsLearned String
   timestamp      DateTime     @default(now())
+
+  @@index([venue])
 }
 
 model AuditLog {

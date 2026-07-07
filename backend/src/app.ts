@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import compression from 'compression';
 import apiRouter from './routes/api.routes';
 import { requestLogger } from './middlewares/logger';
 import { errorHandler, AppError } from './middlewares/error';
@@ -11,6 +12,8 @@ import { errorHandler, AppError } from './middlewares/error';
 dotenv.config();
 
 const app = express();
+app.set('etag', true);
+app.use(compression());
 const PORT = process.env.PORT || 5000;
 
 // Security Middlewares

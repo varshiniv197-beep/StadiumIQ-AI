@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../utils/prisma';
 import { z } from 'zod';
-import { AppError } from '../middlewares/error';
 import { RequestWithUser } from '../middlewares/auth';
-import { Role, Priority, TaskStatus } from '@prisma/client';
+import { VolunteerService } from '../services/volunteer.service';
+import { sendResponse } from '../utils/response';
+import { Priority, TaskStatus } from '@prisma/client';
 
 export const createTaskSchema = z.object({
   body: z.object({
@@ -24,11 +24,8 @@ export class VolunteerController {
   // 1. Get all tasks
   static async getTasks(_req: Request, res: Response, next: NextFunction) {
     try {
-      const tasks = await prisma.volunteerTask.findMany({
-        include: { assignee: { select: { name: true, email: true } } },
-        orderBy: { createdAt: 'desc' }
-      });
-      return res.status(200).json({ success: true, tasks });
+      const tasks = await VolunteerService.getTasks();
+      return sendResponse(res, 200, true, 'Volunteer tasks retrieved successfully.', { tasks });
     } catch (error) {
       return next(error);
     }
@@ -38,15 +35,8 @@ export class VolunteerController {
   static async createTask(req: RequestWithUser, res: Response, next: NextFunction) {
     const { title, description, priority } = req.body;
     try {
-      const newTask = await prisma.volunteerTask.create({
-        data: {
-          title,
-          description,
-          priority: priority as Priority,
-          status: 'OPEN' as TaskStatus
-        }
-      });
-      return res.status(201).json({ success: true, task: newTask });
+      const task = await VolunteerService.createTask(title, description, priority as Priority);
+      return sendResponse(res, 201, true, 'Volunteer task created successfully.', { task });
     } catch (error) {
       return next(error);
     }
@@ -57,24 +47,8 @@ export class VolunteerController {
     const { id } = req.params;
     const { status, assigneeId } = req.body;
     try {
-      const task = await prisma.volunteerTask.findUnique({ where: { id } });
-      if (!task) {
-        return next(new AppError(404, 'Volunteer task not found.'));
-      }
-
-      // Prepare updates
-      const dataUpdate: any = { status: status as TaskStatus };
-      if (assigneeId !== undefined) {
-        dataUpdate.assigneeId = assigneeId;
-      }
-
-      const updated = await prisma.volunteerTask.update({
-        where: { id },
-        data: dataUpdate,
-        include: { assignee: { select: { name: true } } }
-      });
-
-      return res.status(200).json({ success: true, task: updated });
+      const task = await VolunteerService.updateTask(id, status as TaskStatus, assigneeId);
+      return sendResponse(res, 200, true, 'Volunteer task updated successfully.', { task });
     } catch (error) {
       return next(error);
     }
@@ -83,38 +57,8 @@ export class VolunteerController {
   // 4. Get active volunteer counts and status coordinates (Volunteer Live Map simulation)
   static async getVolunteerLocations(_req: Request, res: Response, next: NextFunction) {
     try {
-      // Generate simulated coordinates for active volunteers
-      const volunteerUsers = await prisma.user.findMany({
-        where: { role: 'VOLUNTEER' as Role }
-      });
-
-      const mockStatuses = ['AVAILABLE', 'ASSISTING', 'RESPONDING', 'BREAK'];
-      const mockLocations = [
-        { lat: 40.8125, lng: -74.0744, zone: 'Gate A' },
-        { lat: 40.8135, lng: -74.0734, zone: 'North Concourse' },
-        { lat: 40.8115, lng: -74.0754, zone: 'Section 112' },
-        { lat: 40.8120, lng: -74.0724, zone: 'Food Court West' },
-        { lat: 40.8140, lng: -74.0714, zone: 'Gate D' }
-      ];
-
-      const volunteersMap = volunteerUsers.map((user, idx) => {
-        const loc = mockLocations[idx % mockLocations.length];
-        const status = mockStatuses[idx % mockStatuses.length];
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          status,
-          lat: loc.lat,
-          lng: loc.lng,
-          zone: loc.zone
-        };
-      });
-
-      return res.status(200).json({
-        success: true,
-        volunteers: volunteersMap
-      });
+      const volunteers = await VolunteerService.getVolunteerLocations();
+      return sendResponse(res, 200, true, 'Volunteer locations retrieved successfully.', { volunteers });
     } catch (error) {
       return next(error);
     }

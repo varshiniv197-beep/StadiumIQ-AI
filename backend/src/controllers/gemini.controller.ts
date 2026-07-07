@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { geminiService } from '../services/gemini.service';
 import { z } from 'zod';
+import { sendResponse } from '../utils/response';
 
 export const chatSchema = z.object({
   body: z.object({
@@ -17,11 +18,8 @@ export class GeminiController {
   static async chat(req: Request, res: Response, next: NextFunction) {
     const { message, history, language } = req.body;
     try {
-      const response = await geminiService.generateChatResponse(message, history, language);
-      return res.status(200).json({
-        success: true,
-        response
-      });
+      const chatResponse = await geminiService.generateChatResponse(message, history, language);
+      return sendResponse(res, 200, true, 'Chat response generated successfully.', { response: chatResponse });
     } catch (error) {
       return next(error);
     }

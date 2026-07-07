@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { geminiService } from '../services/gemini.service';
 import { z } from 'zod';
+import { sendResponse } from '../utils/response';
 
 export const announcementSchema = z.object({
   body: z.object({
@@ -15,12 +16,7 @@ export class AnnouncementController {
     const { category, details, targetLanguage } = req.body;
     try {
       const result = await geminiService.generateAnnouncement(category, details, targetLanguage);
-      return res.status(200).json({
-        success: true,
-        script: result.script,
-        translation: result.translation,
-        audioPronunciationHint: result.audioPronunciationHint
-      });
+      return sendResponse(res, 200, true, 'Announcement generated successfully.', result);
     } catch (error) {
       return next(error);
     }

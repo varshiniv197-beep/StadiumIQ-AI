@@ -8,6 +8,7 @@ export interface ChatMessage {
 export class GeminiService {
   private ai: GoogleGenAI | null = null;
   private isMock = true;
+  private cache = new Map<string, { data: any; expiry: number }>();
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -26,12 +27,31 @@ export class GeminiService {
     }
   }
 
+  private getCache(key: string): any | null {
+    const entry = this.cache.get(key);
+    if (entry && entry.expiry > Date.now()) {
+      return entry.data;
+    }
+    return null;
+  }
+
+  private setCache(key: string, data: any, ttlSeconds: number = 60): void {
+    this.cache.set(key, {
+      data,
+      expiry: Date.now() + (ttlSeconds * 1000)
+    });
+  }
+
   // 1. Multilingual Assistant Chat
   async generateChatResponse(
     message: string,
     history: ChatMessage[],
     language: string
   ): Promise<string> {
+    const cacheKey = `chat_${language}_${message}_${JSON.stringify(history)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const systemPrompt = `You are StadiumIQ AI, the official FIFA World Cup 2026 Smart Stadium Operations Assistant.
 Your goal is to assist fans, volunteers, venue staff, and emergency coordinators.
 Answer queries concisely and professionally.
@@ -39,7 +59,9 @@ You must respond in ${language}.
 Provide accurate advice about restrooms, food courts, transport zones, medical help, lost and found, ticket validation, and emergency protocols.`;
 
     if (this.isMock || !this.ai) {
-      return this.mockChatResponse(message, language);
+      const mockRes = this.mockChatResponse(message, language);
+      this.setCache(cacheKey, mockRes, 30);
+      return mockRes;
     }
 
     try {
@@ -57,10 +79,14 @@ Provide accurate advice about restrooms, food courts, transport zones, medical h
         contents: contents as any
       });
 
-      return response.text || 'No response text generated.';
+      const result = response.text || 'No response text generated.';
+      this.setCache(cacheKey, result, 30);
+      return result;
     } catch (error) {
       console.error('[GeminiService] API call failed, falling back to mock:', error);
-      return this.mockChatResponse(message, language) + ' (Fallback Mock Response)';
+      const fallbackRes = this.mockChatResponse(message, language) + ' (Fallback Mock Response)';
+      this.setCache(cacheKey, fallbackRes, 10);
+      return fallbackRes;
     }
   }
 
@@ -76,6 +102,10 @@ Provide accurate advice about restrooms, food courts, transport zones, medical h
     evacuationStrategy: string;
     announcements: { language: string; text: string }[];
   }> {
+    const cacheKey = `sim_${scenario}_${venue}_${JSON.stringify(telemetry)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `Simulate a critical tournament incident: "${scenario}" at ${venue}.
 Current crowd telemetry status: ${JSON.stringify(telemetry)}.
 Generate an emergency operations plan in JSON format matching the schema below:
@@ -91,7 +121,9 @@ Generate an emergency operations plan in JSON format matching the schema below:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockScenarioSimulation(scenario, venue);
+      const mockRes = this.mockScenarioSimulation(scenario, venue);
+      this.setCache(cacheKey, mockRes, 60);
+      return mockRes;
     }
 
     try {
@@ -104,10 +136,14 @@ Generate an emergency operations plan in JSON format matching the schema below:
       });
 
       const text = response.text || '';
-      return JSON.parse(text);
+      const result = JSON.parse(text);
+      this.setCache(cacheKey, result, 60);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Simulation generation failed, falling back to mock:', error);
-      return this.mockScenarioSimulation(scenario, venue);
+      const fallbackRes = this.mockScenarioSimulation(scenario, venue);
+      this.setCache(cacheKey, fallbackRes, 15);
+      return fallbackRes;
     }
   }
 
@@ -120,6 +156,10 @@ Generate an emergency operations plan in JSON format matching the schema below:
     reallocations: { fromZone: string; toZone: string; staffType: string; quantity: number; reason: string }[];
     summary: string;
   }> {
+    const cacheKey = `opt_${venue}_${JSON.stringify(telemetry)}_${JSON.stringify(staffCounts)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `You are a logistics operations planner at ${venue}.
 Telemetry: ${JSON.stringify(telemetry)}
 Current staff distribution: ${JSON.stringify(staffCounts)}
@@ -133,7 +173,9 @@ Return your response in JSON:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockResourceOptimization(venue, telemetry, staffCounts);
+      const mockRes = this.mockResourceOptimization(venue, telemetry, staffCounts);
+      this.setCache(cacheKey, mockRes, 60);
+      return mockRes;
     }
 
     try {
@@ -144,10 +186,14 @@ Return your response in JSON:
           responseMimeType: 'application/json'
         }
       });
-      return JSON.parse(response.text || '{}');
+      const result = JSON.parse(response.text || '{}');
+      this.setCache(cacheKey, result, 60);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Resource optimization failed, falling back to mock:', error);
-      return this.mockResourceOptimization(venue, telemetry, staffCounts);
+      const fallbackRes = this.mockResourceOptimization(venue, telemetry, staffCounts);
+      this.setCache(cacheKey, fallbackRes, 15);
+      return fallbackRes;
     }
   }
 
@@ -168,6 +214,10 @@ Return your response in JSON:
     recommendedActions: string[];
     summary: string;
   }> {
+    const cacheKey = `brief_${venue}_${JSON.stringify(telemetry)}_${JSON.stringify(transit)}_${JSON.stringify(incidents)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `Create an executive operations briefing for ${venue}.
 Telemetry: ${JSON.stringify(telemetry)}
 Transit: ${JSON.stringify(transit)}
@@ -186,7 +236,9 @@ Respond in JSON format:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockOperationalBrief(venue);
+      const mockRes = this.mockOperationalBrief(venue);
+      this.setCache(cacheKey, mockRes, 60);
+      return mockRes;
     }
 
     try {
@@ -197,10 +249,14 @@ Respond in JSON format:
           responseMimeType: 'application/json'
         }
       });
-      return JSON.parse(response.text || '{}');
+      const result = JSON.parse(response.text || '{}');
+      this.setCache(cacheKey, result, 60);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Operational brief failed, falling back to mock:', error);
-      return this.mockOperationalBrief(venue);
+      const fallbackRes = this.mockOperationalBrief(venue);
+      this.setCache(cacheKey, fallbackRes, 15);
+      return fallbackRes;
     }
   }
 
@@ -216,6 +272,10 @@ Respond in JSON format:
     accessibilityInfo: string;
     suggestedGate: string;
   }> {
+    const cacheKey = `journey_${seat}_${transport}_${food}_${accessibility}_${language}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `Create a step-by-step match-day timeline for a fan in seat ${seat} traveling by ${transport}.
 Preferences: food=${food}, accessibility=${accessibility}.
 Write itinerary descriptions in ${language}.
@@ -229,7 +289,9 @@ Return JSON:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockFanJourney(seat, transport, food, accessibility, language);
+      const mockRes = this.mockFanJourney(seat, transport, food, accessibility, language);
+      this.setCache(cacheKey, mockRes, 60);
+      return mockRes;
     }
 
     try {
@@ -240,10 +302,14 @@ Return JSON:
           responseMimeType: 'application/json'
         }
       });
-      return JSON.parse(response.text || '{}');
+      const result = JSON.parse(response.text || '{}');
+      this.setCache(cacheKey, result, 60);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Fan journey failed, falling back to mock:', error);
-      return this.mockFanJourney(seat, transport, food, accessibility, language);
+      const fallbackRes = this.mockFanJourney(seat, transport, food, accessibility, language);
+      this.setCache(cacheKey, fallbackRes, 15);
+      return fallbackRes;
     }
   }
 
@@ -257,6 +323,10 @@ Return JSON:
     translation: string;
     audioPronunciationHint: string;
   }> {
+    const cacheKey = `ann_${category}_${details}_${targetLanguage}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `You are a public announcer. Generate an announcement for: category=${category}, details=${details}.
 Provide the announcement script in English, and translate it to ${targetLanguage}.
 Provide a phonetic pronunciation hint for non-native announcers.
@@ -268,7 +338,9 @@ Return JSON:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockAnnouncement(category, details, targetLanguage);
+      const mockRes = this.mockAnnouncement(category, details, targetLanguage);
+      this.setCache(cacheKey, mockRes, 120);
+      return mockRes;
     }
 
     try {
@@ -279,10 +351,14 @@ Return JSON:
           responseMimeType: 'application/json'
         }
       });
-      return JSON.parse(response.text || '{}');
+      const result = JSON.parse(response.text || '{}');
+      this.setCache(cacheKey, result, 120);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Announcement generation failed, falling back to mock:', error);
-      return this.mockAnnouncement(category, details, targetLanguage);
+      const fallbackRes = this.mockAnnouncement(category, details, targetLanguage);
+      this.setCache(cacheKey, fallbackRes, 30);
+      return fallbackRes;
     }
   }
 
@@ -293,6 +369,10 @@ Return JSON:
     expectedImprovement: string;
     contributingMetrics: { metric: string; weightPercentage: number; state: string }[];
   }> {
+    const cacheKey = `explain_${advice}_${JSON.stringify(telemetry)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `Explain the operational recommendation: "${advice}".
 Telemetry: ${JSON.stringify(telemetry)}
 Detail the confidence score and contributing metrics.
@@ -307,7 +387,9 @@ Return JSON:
 }`;
 
     if (this.isMock || !this.ai) {
-      return this.mockRecommendationExplanation(advice);
+      const mockRes = this.mockRecommendationExplanation(advice);
+      this.setCache(cacheKey, mockRes, 120);
+      return mockRes;
     }
 
     try {
@@ -318,10 +400,14 @@ Return JSON:
           responseMimeType: 'application/json'
         }
       });
-      return JSON.parse(response.text || '{}');
+      const result = JSON.parse(response.text || '{}');
+      this.setCache(cacheKey, result, 120);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Explain recommendation failed, falling back to mock:', error);
-      return this.mockRecommendationExplanation(advice);
+      const fallbackRes = this.mockRecommendationExplanation(advice);
+      this.setCache(cacheKey, fallbackRes, 30);
+      return fallbackRes;
     }
   }
 
@@ -331,6 +417,10 @@ Return JSON:
     telemetry: any[],
     transit: any[]
   ): Promise<string> {
+    const cacheKey = `query_${query}_${JSON.stringify(telemetry)}_${JSON.stringify(transit)}`;
+    const cached = this.getCache(cacheKey);
+    if (cached) return cached;
+
     const prompt = `You are StadiumIQ AI Operations Specialist.
 A stadium manager asks: "${query}"
 Context telemetry: ${JSON.stringify(telemetry)}
@@ -338,7 +428,9 @@ Context transit status: ${JSON.stringify(transit)}
 Provide a direct, data-backed operational explanation. Make it professional.`;
 
     if (this.isMock || !this.ai) {
-      return this.mockOperationsQuery(query);
+      const mockRes = this.mockOperationsQuery(query);
+      this.setCache(cacheKey, mockRes, 60);
+      return mockRes;
     }
 
     try {
@@ -346,10 +438,14 @@ Provide a direct, data-backed operational explanation. Make it professional.`;
         model: 'gemini-1.5-flash',
         contents: prompt
       });
-      return response.text || 'No response text available.';
+      const result = response.text || 'No response text available.';
+      this.setCache(cacheKey, result, 60);
+      return result;
     } catch (error) {
       console.error('[GeminiService] Operations query failed, falling back to mock:', error);
-      return this.mockOperationsQuery(query);
+      const fallbackRes = this.mockOperationsQuery(query);
+      this.setCache(cacheKey, fallbackRes, 15);
+      return fallbackRes;
     }
   }
 
