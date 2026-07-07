@@ -1,0 +1,59 @@
+name: StadiumIQ AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-test:
+    name: Backend Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Root & Backend dependencies
+        run: |
+          npm install
+          cd backend && npm install
+
+      - name: Run Prisma Generate
+        run: |
+          cd backend && npx prisma generate
+
+      - name: Run Backend Tests
+        run: |
+          cd backend && npm run test
+
+      - name: Compile Backend TypeScript
+        run: |
+          cd backend && npm run build
+
+  frontend-test:
+    name: Frontend Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Frontend dependencies
+        run: |
+          cd frontend && npm install
+
+      - name: Compile Frontend Next.js
+        run: |
+          cd frontend && npm run build

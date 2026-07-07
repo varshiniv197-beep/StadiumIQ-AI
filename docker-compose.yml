@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: stadiumiq-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: WorldCup2026Password!
+      POSTGRES_DB: stadiumiq_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - stadiumiq-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stadiumiq-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://admin:WorldCup2026Password!@db:5432/stadiumiq_dev?schema=public
+      - JWT_SECRET=FIFA2026_TournamentOperationsSecureTokenKey!
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=5000
+    depends_on:
+      - db
+    networks:
+      - stadiumiq-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stadiumiq-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - stadiumiq-network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  stadiumiq-network:
+    driver: bridge

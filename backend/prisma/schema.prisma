@@ -1,0 +1,258 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  FAN
+  ORGANIZER
+  VOLUNTEER
+  VENUE_STAFF
+  SECURITY_OFFICER
+  TRANSPORT_COORDINATOR
+  SUSTAINABILITY_MANAGER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum IncidentStatus {
+  REPORTED
+  DISPATCHED
+  RESPONDING
+  RESOLVED
+}
+
+enum TimelineStage {
+  REPORTED
+  DISPATCHED
+  RESPONDING
+  RESOLVED
+  LESSONS_LEARNED
+}
+
+enum TransportType {
+  METRO
+  BUS
+  TAXI
+  RIDESHARE
+}
+
+enum TransitStatusEnum {
+  ON_TIME
+  DELAYED
+  SUSPENDED
+}
+
+enum AlertType {
+  BOTTLENECK
+  OVERCROWDING
+  INCIDENT
+  WEATHER
+  ENERGY
+}
+
+enum RecommendationStatus {
+  OPEN
+  IMPLEMENTED
+  IGNORED
+}
+
+enum VolunteerStatus {
+  AVAILABLE
+  ASSISTING
+  RESPONDING
+  BREAK
+}
+
+enum StadiumVenue {
+  METLIFE_STADIUM // New Jersey (Stadium A)
+  ESTADIO_AZTECA  // Mexico City (Stadium B)
+  BC_PLACE        // Vancouver (Stadium C)
+}
+
+enum IncidentCategory {
+  FIRE
+  MEDICAL
+  PANIC
+  LOST_CHILD
+  SUSPICIOUS_OBJECT
+}
+
+enum RecommendationCategory {
+  LOGISTICS
+  SECURITY
+  CONCESSION
+  CLEANING
+  MEDICAL
+}
+
+enum StaffType {
+  VOLUNTEER
+  SECURITY
+  MEDICAL
+  CLEANING
+}
+
+enum FeedbackRating {
+  HELPFUL
+  NOT_HELPFUL
+}
+
+model User {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  passwordHash String
+  name         String
+  role         Role            @default(FAN)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  tasks        VolunteerTask[]
+}
+
+model CrowdTelemetry {
+  id                 String       @id @default(uuid())
+  venue              StadiumVenue @default(METLIFE_STADIUM)
+  zone               String       // E.g., "Gate A", "North Concourse"
+  crowdCount         Int
+  capacityLimit      Int
+  queueLength        Int
+  avgWaitTimeSeconds Int
+  congestionLevel    Float        // 0.0 to 1.0
+  riskZone           Boolean      @default(false)
+  timestamp          DateTime     @default(now())
+}
+
+model TransitStatus {
+  id                  String            @id @default(uuid())
+  venue               StadiumVenue      @default(METLIFE_STADIUM)
+  transportType       TransportType
+  lineName            String            // E.g., "Line 1", "Shuttle Zone"
+  status              TransitStatusEnum @default(ON_TIME)
+  delayMinutes        Int               @default(0)
+  occupancyPercentage Int
+  parkingOccupancy    Int?
+  timestamp           DateTime          @default(now())
+}
+
+model SustainabilityMetric {
+  id               String       @id @default(uuid())
+  venue            StadiumVenue @default(METLIFE_STADIUM)
+  energyKWh        Float
+  waterLiters      Float
+  wasteKg          Float
+  recyclingPercent Float
+  carbonKg         Float
+  solarGeneration  Float        @default(0.0)
+  foodWasteKg      Float        @default(0.0)
+  timestamp        DateTime     @default(now())
+}
+
+model Incident {
+  id          String             @id @default(uuid())
+  venue       StadiumVenue       @default(METLIFE_STADIUM)
+  category    IncidentCategory
+  severity    Priority           @default(MEDIUM)
+  description String
+  status      IncidentStatus     @default(REPORTED)
+  location    String
+  reportedAt  DateTime           @default(now())
+  resolvedAt  DateTime?
+  timeline    IncidentTimeline[]
+}
+
+model IncidentTimeline {
+  id          String        @id @default(uuid())
+  incidentId  String
+  incident    Incident      @relation(fields: [incidentId], references: [id])
+  stage       TimelineStage
+  description String
+  createdAt   DateTime      @default(now())
+}
+
+model VolunteerTask {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  priority    Priority   @default(MEDIUM)
+  status      TaskStatus @default(OPEN)
+  assigneeId  String?
+  assignee    User?      @relation(fields: [assigneeId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model CrowdAlert {
+  id              String       @id @default(uuid())
+  venue           StadiumVenue @default(METLIFE_STADIUM)
+  type            AlertType    @default(BOTTLENECK)
+  severity        Priority     @default(MEDIUM)
+  message         String
+  suggestedAction String
+  timestamp       DateTime     @default(now())
+}
+
+model OperationalRecommendation {
+  id                  String                 @id @default(uuid())
+  venue               StadiumVenue           @default(METLIFE_STADIUM)
+  category            RecommendationCategory
+  advice              String
+  reasoning           String                 @default("")
+  confidence          Int                    @default(90)
+  expectedImprovement String                 @default("")
+  status              RecommendationStatus   @default(OPEN)
+  createdAt           DateTime               @default(now())
+}
+
+model StaffReallocation {
+  id        String       @id @default(uuid())
+  venue     StadiumVenue @default(METLIFE_STADIUM)
+  fromZone  String
+  toZone    String
+  staffType StaffType
+  quantity  Int
+  reason    String
+  timestamp DateTime     @default(now())
+}
+
+model LearningLog {
+  id             String       @id @default(uuid())
+  venue          StadiumVenue @default(METLIFE_STADIUM)
+  eventName      String       // Scenario run (e.g. "Stampede simulation")
+  recommendation String
+  humanAction    String       // "Implemented" | "Modified" | "Ignored"
+  outcome        String
+  lessonsLearned String
+  timestamp      DateTime     @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  details   String
+  timestamp DateTime @default(now())
+}
+
+model AIFeedback {
+  id               String         @id @default(uuid())
+  recommendationId String
+  userRole         Role
+  rating           FeedbackRating
+  comments         String?
+  timestamp        DateTime       @default(now())
+}
