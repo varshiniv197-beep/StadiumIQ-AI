@@ -57,6 +57,29 @@ StadiumIQ AI combines operational telemetry with Generative AI (Gemini 1.5 Flash
 
 ---
 
+## 🎯 Problem Statement Alignment
+
+The FIFA World Cup 2026 presents unique operational challenges due to its scale, multiple host nations, high visitor volumes, multilingual audiences, and strict safety requirements.
+
+StadiumIQ AI addresses these operational challenges through an AI-assisted command platform that helps venue operators monitor crowd conditions, coordinate transportation, improve accessibility, manage sustainability metrics, assist emergency response teams, and provide multilingual support for visitors.
+
+Rather than replacing human decision-making, StadiumIQ AI augments operational teams by transforming real-time telemetry into explainable recommendations, allowing faster and more informed responses during tournament operations.
+
+### Operational Challenges → StadiumIQ AI Modules
+
+| Challenge | Platform Module |
+|-----------|-----------------|
+| Crowd congestion | AI Crowd Intelligence |
+| Emergency coordination | Incident Command Center |
+| Volunteer logistics | Volunteer Operations Dashboard |
+| Transportation delays | AI Transit Dashboard |
+| Accessibility | Smart Indoor Navigation |
+| Sustainability | Sustainability Intelligence |
+| Language barriers | Gemini Multilingual Assistant |
+| Executive decision support | AI Command Center |
+
+---
+
 ## 2. Repository Highlights
 
 | Metric | Value |
@@ -221,6 +244,55 @@ The codebase adheres strictly to enterprise code standards:
 *   **Centralized Error Handling**: Prevents leaks and returns uniform HTTP payload error models.
 *   **Shared Response Utilities**: Uniform API response wrapper maps all endpoints cleanly.
 *   **Environment-Based Configuration**: Clean separation of dev, test, and production database setups.
+
+---
+
+## 🏛️ Architecture Decisions
+
+The platform was designed around the following engineering principles:
+*   **Separation of concerns**: Strict decoupling of database transactions, controllers, and services.
+*   **Stateless REST APIs**: Complete stateless routing mapped cleanly to generic response bodies.
+*   **Explainable AI recommendations**: Injects telemetry and weights before generating suggestions.
+*   **Modular frontend architecture**: Structured React layout layers minimizing component sizes.
+*   **Type-safe development**: Strictly typed schema boundaries on all client/server exchanges.
+*   **Reusable UI components**: Standard components for analytics charts, alerts, and navigation cards.
+*   **Scalable repository structures**: Abstracted access interfaces decoupling server engines from DB types.
+*   **Environment-based configuration**: Shared env structures for development, local, and production deployments.
+*   **Accessibility-first design**: Dynamic state scaling of fonts and high-contrast color toggles.
+*   **Security by default**: Production headers protection and JWT session tracking.
+
+---
+
+## 📊 Quality Metrics
+
+| Category | Status |
+|-----------|--------|
+| TypeScript | Strict Mode |
+| Linting | ESLint |
+| Formatting | Prettier |
+| API Validation | Zod |
+| Authentication | JWT |
+| Password Security | bcrypt |
+| Testing | Vitest + Supertest |
+| Accessibility | WCAG 2.2 AA |
+| Responsive Design | Mobile / Tablet / Desktop |
+
+---
+
+## 🎨 Design Principles
+
+The user interface was designed using five principles:
+*   **Simplicity**: Clean, flat glassmorphic dashboards avoiding clutter.
+*   **Operational clarity**: Color-coded safety logs, alerts, and priority badges.
+*   **Accessibility-first**: Complies with AA guidelines, offering keyboard navigation and font sizing tools.
+*   **Low cognitive load**: Logical information grids prioritizing crucial action details.
+*   **Mobile-first responsiveness**: Fully dynamic grid layouts matching mobile sensor displays.
+
+---
+
+## 🧠 Explainable AI
+
+Unlike traditional AI assistants, StadiumIQ AI explains every recommendation by combining telemetry, operational rules, historical patterns, and current venue conditions before generating suggested actions. Operators remain in control and every recommendation can be reviewed before execution.
 
 ---
 
