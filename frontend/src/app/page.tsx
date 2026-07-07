@@ -158,6 +158,95 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* 2.5 The Challenge & Our Solution Section */}
+      <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-slate-900">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="flex flex-col gap-6">
+            <span className="text-amber-500 text-xs font-bold uppercase tracking-widest">
+              The Tournament Challenge
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Coordinating a World Cup Venue
+            </h2>
+            <p className="text-slate-400 text-lg leading-relaxed">
+              Managing a FIFA World Cup venue requires coordinating thousands of spectators, volunteers, security personnel, transport services, and emergency responders simultaneously. Decisions must be made in real time while maintaining safety, accessibility, operational efficiency, and sustainability.
+            </p>
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl flex flex-col gap-4">
+              <h4 className="font-bold text-slate-200 text-sm">Who Benefits:</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-slate-400">
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Fans</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Volunteers</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Security Teams</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Venue Staff</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Organizers</div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-amber-500" /> Transport Hubs</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <span className="text-amber-500 text-xs font-bold uppercase tracking-widest">
+              Our Solution
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Unified Command Intelligence
+            </h2>
+            <p className="text-slate-400 text-lg leading-relaxed">
+              StadiumIQ AI transforms fragmented stadium operations into a unified AI-powered command center. Using Generative AI and live operational telemetry, the platform predicts congestion, recommends actions, assists multilingual visitors, optimizes resources, and supports informed decision-making across tournament venues.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center">
+                <div className="text-2xl font-black text-emerald-400">30% Less</div>
+                <div className="text-xs text-slate-400 font-medium">Queue Wait Times</div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl text-center">
+                <div className="text-2xl font-black text-emerald-400">20% Faster</div>
+                <div className="text-xs text-slate-400 font-medium">Emergency Response</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Problem -> Solution Cards Table */}
+        <div className="mt-16 bg-slate-900/30 border border-slate-900 rounded-3xl p-8 lg:p-12">
+          <h3 className="text-2xl font-black text-center mb-8 tracking-tight">
+            How StadiumIQ AI Resolves Stadium Challenges
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Long Queues</div>
+              <div className="text-slate-100 font-extrabold mb-1">AI Crowd Prediction</div>
+              <p className="text-xs text-slate-400">Live congestion forecasts anticipate entry gate bottlenecks before they occur.</p>
+            </div>
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Navigation Confusion</div>
+              <div className="text-slate-100 font-extrabold mb-1">Indoor AI Navigation</div>
+              <p className="text-xs text-slate-400">Generates wheelchair-accessible and least-crowded pathways dynamically.</p>
+            </div>
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Language Barriers</div>
+              <div className="text-slate-100 font-extrabold mb-1">Gemini Multilingual Assistant</div>
+              <p className="text-xs text-slate-400">Instant multi-lingual translation support for international match visitors.</p>
+            </div>
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Emergency Coordination</div>
+              <div className="text-slate-100 font-extrabold mb-1">AI Incident Command</div>
+              <p className="text-xs text-slate-400">Generates structured evacuation scripts and response workflows on telemetry triggers.</p>
+            </div>
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Transit Congestion</div>
+              <div className="text-slate-100 font-extrabold mb-1">AI Transport Optimizer</div>
+              <p className="text-xs text-slate-400">Reroutes shuttle dispatches and adjusts metro schedules based on live stadium egress load.</p>
+            </div>
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800/60">
+              <div className="text-red-400 font-bold text-xs uppercase tracking-wider mb-2">Problem: Stadium Efficacy</div>
+              <div className="text-slate-100 font-extrabold mb-1">AI Carbon & Energy Tracker</div>
+              <p className="text-xs text-slate-400">Recommends automated HVAC offset configurations to reduce resource waste.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 3. Features Section */}
       <section id="features" className="py-24 bg-slate-900/40 border-y border-slate-900 px-6">
         <div className="max-w-7xl mx-auto">

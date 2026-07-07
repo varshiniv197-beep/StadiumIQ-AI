@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ApiResponse } from '../utils/response';
 
 export class AppError extends Error {
   constructor(
@@ -41,31 +42,24 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  const timestamp = new Date().toISOString();
-
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      success: false,
-      message: err.message,
-      data: err.errors || null,
-      timestamp
-    });
+    return ApiResponse.error(res, err.message, err.errors || null, err.statusCode);
   }
 
   // Handle SQLite constraint or Prisma error details
   if (err.message.includes('Prisma') || err.name.includes('Prisma')) {
-    return res.status(400).json({
-      success: false,
-      message: 'Database operational constraint violated.',
-      data: process.env.NODE_ENV === 'production' ? null : { details: err.message },
-      timestamp
-    });
+    return ApiResponse.error(
+      res,
+      'Database operational constraint violated.',
+      process.env.NODE_ENV === 'production' ? null : { details: err.message },
+      400
+    );
   }
 
-  return res.status(500).json({
-    success: false,
-    message: 'Internal server error.',
-    data: process.env.NODE_ENV === 'production' ? null : { details: err.message },
-    timestamp
-  });
+  return ApiResponse.error(
+    res,
+    'Internal server error.',
+    process.env.NODE_ENV === 'production' ? null : { details: err.message },
+    500
+  );
 };
